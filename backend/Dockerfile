@@ -24,4 +24,4 @@ RUN git clone --single --depth 1 https://github.com/jsbroks/dextr-keras.git /tmp
     cd /tmp/dextr && \
     python setup.py install
 
-RUN apt-get -y -o Dpkg::Options::="--force-confmiss" install --reinstall netbase
+RUN apt-get -y -o Dpkg::Options::="--force-confmiss" install --reinstall netbase libsm6 libxext6 libxrender-dev
