@@ -69,5 +69,8 @@ class Config:
 
     DEXTR_FILE = os.getenv("DEXTR_FILE", "/models/dextr_pascal-sbd.h5")
 
+    CROWD_APP_URL = os.getenv("CROWD_APP_URL")
+    CROWD_APP_USER = os.getenv("CROWD_APP_USER")
+    CROWD_APP_PASS = os.getenv("CROWD_APP_PASS")
 
 __all__ = ["Config"]

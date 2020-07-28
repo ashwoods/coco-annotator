@@ -1,3 +1,4 @@
+
 import eventlet
 eventlet.monkey_patch(thread=False)
 
@@ -24,6 +25,8 @@ from .util import query_util, thumbnails
 from .authentication import login_manager
 from .sockets import socketio
 
+import crowd
+import click
 import threading
 import requests
 import logging
@@ -51,11 +54,12 @@ def create_app():
     flask.register_blueprint(api)
 
     login_manager.init_app(flask)
-    socketio.init_app(flask, message_queue=Config.CELERY_BROKER_URL)
-    # Remove all poeple who were annotating when
-    # the server shutdown
-    ImageModel.objects.update(annotating=[])
-    thumbnails.generate_thumbnails()
+    if Config.CELERY_BROKER_URL:
+        socketio.init_app(flask, message_queue=Config.CELERY_BROKER_URL)
+        # Remove all poeple who were annotating when
+        # the server shutdown
+        ImageModel.objects.update(annotating=[])
+        thumbnails.generate_thumbnails()
 
     return flask
 
@@ -79,3 +83,12 @@ def index(path):
         return requests.get('http://frontend:8080/{}'.format(path)).text
 
     return app.send_static_file('index.html')
+
+@app.cli.command("test-crowd-auth")
+@click.argument("username")
+@click.argument("password")
+def test_crowd_auth(username, password):
+    # Create the reusable Crowd object
+    if all([Config.CROWD_APP_URL, Config.CROWD_APP_USER, Config.CROWD_APP_PASS]):
+        cs = crowd.CrowdServer(Config.CROWD_APP_URL, Config.CROWD_APP_USER, Config.CROWD_APP_PASS)
+        print(cs.auth_user(username, password))
